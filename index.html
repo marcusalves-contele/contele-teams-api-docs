@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API de Integração — Contele Equipes (Teams)</title>
+<meta name="description" content="Documentação da API de Integração do Contele Equipes (Teams). Endpoints, autenticação, parâmetros e exemplos.">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+<!-- Top bar (mobile) -->
+<header class="topbar">
+  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <span class="topbar-brand">Contele <span>Teams</span> API</span>
+</header>
+<div class="overlay" id="overlay"></div>
+
+<div class="layout">
+
+  <!-- ============ SIDEBAR ============ -->
+  <nav class="sidebar" id="sidebar">
+    <div class="brand-block">
+      <div class="brand">Contele <span>Equipes</span></div>
+      <div class="brand-sub">API de Integração · v2</div>
+    </div>
+
+    <div class="search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="navSearch" placeholder="Filtrar endpoints…" autocomplete="off" aria-label="Filtrar endpoints">
+    </div>
+
+    <div class="nav-scroll">
+      <div class="nav-group">Começar</div>
+      <a href="#introducao" class="nav-link">Introdução</a>
+      <a href="#autenticacao" class="nav-link">Autenticação</a>
+
+      <div class="nav-group">POIs (Locais)</div>
+      <a href="#pois-listar" class="nav-link"><span class="m m-get">GET</span> Listar locais</a>
+      <a href="#pois-criar" class="nav-link"><span class="m m-post">POST</span> Criar local</a>
+      <a href="#pois-batch" class="nav-link"><span class="m m-del">DEL</span> Excluir em lote</a>
+      <a href="#pois-id" class="nav-link"><span class="m m-get">GET</span> Buscar por ID</a>
+      <a href="#pois-atualizar" class="nav-link"><span class="m m-put">PUT</span> Atualizar local</a>
+      <a href="#pois-portifolios" class="nav-link"><span class="m m-get">GET</span> Portfólios do local</a>
+
+      <div class="nav-group">Portfólios (Carteiras)</div>
+      <a href="#port-listar" class="nav-link"><span class="m m-get">GET</span> Listar portfólios</a>
+      <a href="#port-vincular" class="nav-link"><span class="m m-put">PUT</span> Vincular portfólio</a>
+      <a href="#port-remover" class="nav-link"><span class="m m-del">DEL</span> Remover vínculo</a>
+      <a href="#port-pois" class="nav-link"><span class="m m-get">GET</span> Locais do portfólio</a>
+
+      <div class="nav-group">Refunds (Reembolsos)</div>
+      <a href="#ref-listar" class="nav-link"><span class="m m-get">GET</span> Listar reembolsos</a>
+      <a href="#ref-criar" class="nav-link"><span class="m m-post">POST</span> Criar reembolso</a>
+      <a href="#ref-km" class="nav-link"><span class="m m-get">GET</span> Listar por KM</a>
+      <a href="#ref-km-id" class="nav-link"><span class="m m-get">GET</span> Buscar KM por ID</a>
+      <a href="#ref-id" class="nav-link"><span class="m m-get">GET</span> Buscar por ID <span class="dot-bug" title="Bug confirmado"></span></a>
+      <a href="#ref-atualizar" class="nav-link"><span class="m m-put">PUT</span> Atualizar reembolso</a>
+
+      <div class="nav-group">Tasks (Visitas)</div>
+      <a href="#task-listar" class="nav-link"><span class="m m-get">GET</span> Listar visitas</a>
+      <a href="#task-criar" class="nav-link"><span class="m m-post">POST</span> Criar visita</a>
+      <a href="#task-excluir" class="nav-link"><span class="m m-del">DEL</span> Excluir visitas</a>
+      <a href="#task-id" class="nav-link"><span class="m m-get">GET</span> Buscar por ID</a>
+      <a href="#task-atualizar" class="nav-link"><span class="m m-put">PUT</span> Atualizar visita</a>
+      <a href="#task-reagendar" class="nav-link"><span class="m m-post">POST</span> Reagendar visita</a>
+
+      <div class="nav-group">Users & Categories</div>
+      <a href="#users-listar" class="nav-link"><span class="m m-get">GET</span> Listar usuários</a>
+      <a href="#cat-listar" class="nav-link"><span class="m m-get">GET</span> Listar categorias</a>
+
+      <div class="nav-group">Referência</div>
+      <a href="#erros" class="nav-link">Erros & status HTTP</a>
+      <a href="#qa" class="nav-link">Achados de QA</a>
+    </div>
+  </nav>
+
+  <!-- ============ MAIN ============ -->
+  <main class="content" id="conteudo" tabindex="-1">
+
+    <!-- INTRO -->
+    <section id="introducao" class="section">
+      <p class="eyebrow">API REST · v2</p>
+      <h1>API de Integração — Contele Equipes (Teams)</h1>
+      <p class="lead">Documentação dos endpoints da API de integração do Contele Equipes. Permite gerenciar <strong>locais (POIs)</strong>, <strong>portfólios</strong>, <strong>visitas (tasks)</strong>, <strong>reembolsos</strong>, usuários, categorias e formulários.</p>
+
+      <div class="kv-grid">
+        <div class="kv">
+          <span class="kv-label">Base URL</span>
+          <code class="kv-value">https://integration.contelege.com.br/v2</code>
+        </div>
+        <div class="kv">
+          <span class="kv-label">Documentação oficial (Swagger)</span>
+          <a class="kv-value" href="https://contele.github.io/api_de_integracao_contele_equipes/" target="_blank" rel="noopener">contele.github.io/api_de_integracao_contele_equipes</a>
+        </div>
+      </div>
+
+      <h3>Legenda de status</h3>
+      <p>Cada endpoint exibe um selo indicando o estado de validação:</p>
+      <ul class="legend">
+        <li><span class="pill pill-ok">✅ Testado (200)</span> Validado em teste real, respondeu corretamente.</li>
+        <li><span class="pill pill-bug">🔴 Bug</span> Comportamento incorreto confirmado em teste.</li>
+        <li><span class="pill pill-todo">⏳ Não testado</span> Endpoint de escrita (POST/PUT/DELETE) ainda não validado.</li>
+      </ul>
+    </section>
+
+    <!-- AUTH -->
+    <section id="autenticacao" class="section">
+      <h2><span class="h-anchor">#</span> Autenticação</h2>
+      <p>Todas as requisições exigem <strong>dois cabeçalhos obrigatórios</strong>. O par precisa ser da <strong>mesma geração</strong> — um par inválido, descasado ou rotacionado retorna <code>403 Forbidden</code> (confirmado em teste).</p>
+
+      <table>
+        <thead><tr><th>Cabeçalho</th><th>Valor</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>authorization</code></td><td><code>Bearer &lt;seu_token&gt;</code></td><td>Token de acesso (Bearer).</td></tr>
+          <tr><td><code>x-api-key</code></td><td><code>&lt;sua_chave&gt;</code></td><td>Chave de API pareada ao token.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code" data-lang="bash">
+        <div class="code-head"><span class="code-lang">Headers</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>authorization: Bearer &lt;seu_token&gt;
+x-api-key: &lt;sua_chave&gt;</code></pre>
+      </div>
+
+      <div class="callout callout-amber">
+        <strong>Atenção:</strong> token e chave precisam pertencer à mesma geração. Após rotacionar credenciais, atualize <em>os dois</em> valores juntos.
+      </div>
+    </section>
+
+    <!-- ===================== POIs ===================== -->
+    <section class="cat-divider" id="cat-pois"><h2>POIs (Locais)</h2><p>Pontos de interesse — os locais cadastrados que recebem visitas.</p></section>
+
+    <!-- GET /pois -->
+    <article id="pois-listar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/pois</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Listar locais</h3>
+      <p>Retorna a lista de locais (pontos de interesse) cadastrados.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros de query</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>page</code></td><td>integer</td><td><span class="req req-warn">Sim*</span></td><td>Página a recuperar. <strong>Divergência confirmada:</strong> o Swagger marca como opcional, mas sem ele a chamada não retorna dados.</td></tr>
+          <tr><td><code>perPage</code></td><td>integer</td><td><span class="req req-warn">Sim*</span></td><td>Itens por página. Mesma divergência — obrigatório na prática.</td></tr>
+          <tr><td><code>customId</code></td><td>string</td><td><span class="req req-no">Não</span></td><td>Filtro por ID customizado.</td></tr>
+          <tr><td><code>corporateName</code></td><td>string</td><td><span class="req req-no">Não</span></td><td>Filtro por razão social.</td></tr>
+          <tr><td><code>cnpj_cpf</code></td><td>string</td><td><span class="req req-no">Não</span></td><td>Filtro por CNPJ/CPF.</td></tr>
+          <tr><td><code>id</code></td><td>string</td><td><span class="req req-no">Não</span></td><td>Filtro por ID do local.</td></tr>
+          <tr><td><code>orderBy</code></td><td>string</td><td><span class="req req-no">Não</span></td><td>Ordenação dos resultados.</td></tr>
+          <tr><td><code>include</code></td><td>string</td><td><span class="req req-no">Não</span></td><td>Relacionamentos a incluir.</td></tr>
+        </tbody>
+      </table>
+      <p class="fineprint">* Opcional no Swagger, obrigatório na prática.</p>
+
+      <h4>Exemplo de requisição</h4>
+      <div class="code" data-lang="bash">
+        <div class="code-head"><span class="code-lang">cURL</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>curl --request GET \
+  --url 'https://integration.contelege.com.br/v2/pois?page=1&amp;perPage=10' \
+  --header 'authorization: Bearer &lt;seu_token&gt;' \
+  --header 'x-api-key: &lt;sua_chave&gt;'</code></pre>
+      </div>
+
+      <h4>Resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>[
+  {
+    "id": "1a4c98eb-705a-4314-b394-4b71c2b9352c",
+    "name": "100139507 - MM PRANDINI & CIA LTDA",
+    "corporateName": "100139507 - MM PRANDINI & CIA LTDA",
+    "cnpj_cpf": "...",
+    "status": "positioned",
+    "categoryId": 195468,
+    "address": {
+      "city": "SAO JOSE DOS QUATRO MARCOS",
+      "state": "MT",
+      "street": "...",
+      "zipcode": "78285000",
+      "neighborhood": "CENTRO"
+    },
+    "contacts": [ { "phone": "...", "email": "..." } ]
+  }
+]</code></pre>
+      </div>
+    </article>
+
+    <!-- POST /pois -->
+    <article id="pois-criar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-post">POST</span>
+        <code class="ep-path">/pois</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Criar local</h3>
+      <p>Cria um novo local (e, se necessário, vincula/cria categoria).</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Corpo da requisição</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>Poi</code></td><td>object</td><td><span class="req req-yes">Sim</span></td><td>Objeto do local. Na prática <code>name</code> e endereço são esperados.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Exemplo de requisição</h4>
+      <div class="code" data-lang="bash">
+        <div class="code-head"><span class="code-lang">cURL</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>curl --request POST \
+  --url 'https://integration.contelege.com.br/v2/pois' \
+  --header 'authorization: Bearer &lt;seu_token&gt;' \
+  --header 'x-api-key: &lt;sua_chave&gt;' \
+  --header 'content-type: application/json' \
+  --data '{ "name": "Loja Nova", "corporateName": "EMPRESA LTDA" }'</code></pre>
+      </div>
+
+      <h4>Exemplo de resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "id": "9f3b2c14-7a8e-4d21-bb90-1c2d3e4f5a6b",
+  "name": "Loja Nova",
+  "corporateName": "EMPRESA LTDA",
+  "status": "not_positioned",
+  "categoryId": 195468,
+  "address": { "city": "...", "state": "...", "street": "...", "zipcode": "..." },
+  "contacts": [],
+  "createdAt": "2026-06-09T13:00:00.000Z",
+  "updatedAt": "2026-06-09T13:00:00.000Z"
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- DELETE /pois/batch -->
+    <article id="pois-batch" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-del">DELETE</span>
+        <code class="ep-path">/pois/batch</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+        <span class="pill pill-danger">destrutivo</span>
+      </div>
+      <h3 class="ep-title">Excluir locais em lote</h3>
+      <p>Apaga vários locais de uma vez.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Corpo da requisição</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>input</code></td><td>object</td><td><span class="req req-yes">Sim</span></td><td>Lista de IDs a excluir.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-red"><strong>Operação destrutiva.</strong> Remove locais permanentemente. Valide os IDs antes de enviar.</div>
+
+      <h4>Exemplo de resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "deleted": 3,
+  "ids": [
+    "1a4c98eb-705a-4314-b394-4b71c2b9352c",
+    "639d9a62-1f0c-4b2a-8e77-2a1d9c6e4f10",
+    "065068b8-ed6b-4e9c-b619-fe2d0a5fc393"
+  ]
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- GET /pois/{poiId} -->
+    <article id="pois-id" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/pois/{poiId}</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Buscar local por ID</h3>
+      <p>Retorna os dados de um local específico.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros de path</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>poiId</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>ID do local.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Exemplo de requisição</h4>
+      <div class="code" data-lang="bash">
+        <div class="code-head"><span class="code-lang">cURL</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>curl --request GET \
+  --url 'https://integration.contelege.com.br/v2/pois/1a4c98eb-705a-4314-b394-4b71c2b9352c' \
+  --header 'authorization: Bearer &lt;seu_token&gt;' \
+  --header 'x-api-key: &lt;sua_chave&gt;'</code></pre>
+      </div>
+
+      <h4>Resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "id": "1a4c98eb-705a-4314-b394-4b71c2b9352c",
+  "name": "100139507 - MM PRANDINI & CIA LTDA",
+  "corporateName": "...",
+  "cnpj_cpf": "...",
+  "status": "positioned",
+  "categoryId": 195468,
+  "address": {
+    "city": "...", "state": "...", "street": "...", "zipcode": "...",
+    "location": { "latitude": -15.62, "longitude": -58.17 }
+  },
+  "contacts": [ { "phone": "...", "email": "..." } ],
+  "createdAt": "...", "updatedAt": "..."
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- PUT /pois/{poiId} -->
+    <article id="pois-atualizar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-put">PUT</span>
+        <code class="ep-path">/pois/{poiId}</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Atualizar local</h3>
+      <p>Atualiza os dados de um local existente.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>poiId</code></td><td>string (path)</td><td><span class="req req-yes">Sim</span></td><td>ID do local a atualizar.</td></tr>
+          <tr><td><code>body</code></td><td>object</td><td><span class="req req-yes">Sim</span></td><td>Campos do local a serem atualizados.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Exemplo de resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "id": "1a4c98eb-705a-4314-b394-4b71c2b9352c",
+  "name": "100139507 - MM PRANDINI &amp; CIA LTDA",
+  "corporateName": "...",
+  "status": "positioned",
+  "categoryId": 195468,
+  "updatedAt": "2026-06-09T13:05:00.000Z"
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- GET /pois/{poiId}/portifolios -->
+    <article id="pois-portifolios" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/pois/{poiId}/portifolios</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Listar portfólios de um local</h3>
+      <p>Retorna os portfólios (carteiras) vinculados a um local.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros de path</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>poiId</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>ID do local.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "portifolios": [
+    {
+      "id": "065068b8-ed6b-4e9c-b619-fe2d0a5fc393",
+      "name": "Carteira do funcionário Tauany Patricia"
+    }
+  ]
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- ===================== PORTFÓLIOS ===================== -->
+    <section class="cat-divider" id="cat-port"><h2>Portfólios (Carteiras)</h2><p>Carteiras que agrupam locais por responsável ou rota.</p></section>
+
+    <!-- GET /portifolios -->
+    <article id="port-listar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/portifolios</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Listar portfólios</h3>
+      <p>Retorna todas as carteiras.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "portifolios": [
+    { "id": "1e33803d-c4b5-441e-90e8-f9f8314fbdff", "name": "Rota 1" }
+  ]
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- PUT /portifolios -->
+    <article id="port-vincular" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-put">PUT</span>
+        <code class="ep-path">/portifolios</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Vincular portfólio</h3>
+      <p>Cria um vínculo entre um portfólio e um local.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Corpo da requisição</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>PortifolioRelation</code></td><td>object</td><td><span class="req req-yes">Sim</span></td><td>Relação entre portfólio e local(is).</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Exemplo de resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "message": "Portfólio vinculado com sucesso",
+  "portifolioId": "1e33803d-c4b5-441e-90e8-f9f8314fbdff",
+  "poiId": "1a4c98eb-705a-4314-b394-4b71c2b9352c"
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- DELETE /portifolios -->
+    <article id="port-remover" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-del">DELETE</span>
+        <code class="ep-path">/portifolios</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Remover vínculo de portfólio</h3>
+      <p>Remove o vínculo entre um portfólio e um local.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Corpo da requisição</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>PortifolioRelation</code></td><td>object</td><td><span class="req req-yes">Sim</span></td><td>Relação a ser removida.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Exemplo de resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{ "message": "Vínculo removido com sucesso" }</code></pre>
+      </div>
+    </article>
+
+    <!-- GET /portifolios/{portifolioId}/pois -->
+    <article id="port-pois" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/portifolios/{portifolioId}/pois</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Listar locais de um portfólio</h3>
+      <p>Retorna os locais vinculados a um portfólio.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros de path</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>portifolioId</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>ID do portfólio.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "pois": [
+    {
+      "id": "639d9a62-...",
+      "name": "100103979 - LOTERICA POCONE LTDA",
+      "status": "positioned",
+      "categoryId": 190179,
+      "address": { },
+      "contacts": [ ]
+    }
+  ]
+}</code></pre>
+      </div>
+      <div class="callout callout-info">A lista traz locais em estados variados: <code>positioned</code>, <code>not_positioned</code>, <code>valid</code>.</div>
+    </article>
+
+    <!-- ===================== REFUNDS ===================== -->
+    <section class="cat-divider" id="cat-ref"><h2>Refunds (Reembolsos)</h2><p>Reembolsos lançados pelos colaboradores, incluindo reembolso por quilometragem.</p></section>
+
+    <!-- GET /refunds -->
+    <article id="ref-listar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/refunds</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Listar reembolsos</h3>
+      <p>Retorna a lista de reembolsos.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+    </article>
+
+    <!-- POST /refunds -->
+    <article id="ref-criar" class="endpoint flag-blue">
+      <div class="ep-head">
+        <span class="m-badge m-post">POST</span>
+        <code class="ep-path">/refunds</code>
+        <span class="pill pill-todo">⏳ Não testado</span>
+      </div>
+      <h3 class="ep-title">Criar reembolso</h3>
+      <p>Lança um novo reembolso para um usuário.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Corpo da requisição</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>date</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>Data do reembolso.</td></tr>
+          <tr><td><code>userId</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>ID do usuário.</td></tr>
+          <tr><td><code>value</code></td><td>number</td><td><span class="req req-yes">Sim</span></td><td>Valor do reembolso.</td></tr>
+        </tbody>
+      </table>
+    </article>
+
+    <!-- GET /refunds/km -->
+    <article id="ref-km" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/refunds/km</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Listar reembolsos por KM</h3>
+      <p>Retorna reembolsos baseados em quilometragem percorrida.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "page": 1,
+  "perPage": 10,
+  "refunds": [
+    {
+      "id": "019d9ce5-...",
+      "date": "2026-04-17T00:00:00.000Z",
+      "value": 0,
+      "kilometers": 0,
+      "coefficient": 1,
+      "startRoute": { },
+      "endRoute": { },
+      "userId": "...",
+      "createdAt": "..."
+    }
+  ]
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- GET /refunds/km/{refundId} -->
+    <article id="ref-km-id" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/refunds/km/{refundId}</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Buscar reembolso por KM por ID</h3>
+      <p>Retorna um reembolso por quilometragem específico.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros de path</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>refundId</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>ID do reembolso por KM.</td></tr>
+        </tbody>
+      </table>
+    </article>
+
+    <!-- GET /refunds/{refundId} - BUG -->
+    <article id="ref-id" class="endpoint flag-red">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/refunds/{refundId}</code>
+        <span class="pill pill-bug">🔴 Bug — retorna 500</span>
+      </div>
+      <h3 class="ep-title">Buscar reembolso por ID</h3>
+      <p>Deveria retornar um reembolso específico.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros de path</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>refundId</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>ID do reembolso.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-red">
+        <strong>🔴 Achado de QA confirmado:</strong> retorna <code>500 Internal Server Error</code> mesmo com <code>refundId</code> válido obtido na lista <code>/refunds</code>. Testado com 2 IDs diferentes — ambos 500.<br>
+        <strong>Reference id:</strong> <code>0e9e14a8-5d55-485e-905c-a4ae58f31c07</code> (+ o do 2º teste).<br>
+        <strong>Recomendação:</strong> reportar ao time da API com os reference ids.
+      </div>
+
+      <h4>Resposta <span class="status-code sc-500">500</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{ "message": "internal server error (0e9e14a8-5d55-485e-905c-a4ae58f31c07)" }</code></pre>
+      </div>
+    </article>
+
+    <!-- PUT /refunds/{refundId} -->
+    <article id="ref-atualizar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-put">PUT</span>
+        <code class="ep-path">/refunds/{refundId}</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Atualizar reembolso</h3>
+      <p>Atualiza o estado de um reembolso.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>refundId</code></td><td>string (path)</td><td><span class="req req-yes">Sim</span></td><td>ID do reembolso.</td></tr>
+          <tr><td><code>state</code></td><td>string (body)</td><td><span class="req req-yes">Sim</span></td><td>Novo estado do reembolso.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Exemplo de resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "id": "019d9ce5-3a2b-7f10-8c44-5e6d7a8b9c01",
+  "date": "2026-04-17T00:00:00.000Z",
+  "value": 0,
+  "state": "approved",
+  "userId": "...",
+  "updatedAt": "2026-06-09T13:10:00.000Z"
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- ===================== TASKS ===================== -->
+    <section class="cat-divider" id="cat-task"><h2>Tasks (Visitas)</h2><p>Visitas agendadas e realizadas pelos colaboradores em campo.</p></section>
+
+    <!-- GET /tasks -->
+    <article id="task-listar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/tasks</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Listar visitas</h3>
+      <p>Retorna a lista de visitas.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros de query</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>page</code></td><td>integer</td><td><span class="req req-yes">Sim</span></td><td>Página a recuperar.</td></tr>
+          <tr><td><code>perPage</code></td><td>integer</td><td><span class="req req-yes">Sim</span></td><td>Itens por página.</td></tr>
+          <tr><td><code>timezone</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>Fuso horário, ex: <code>America/Sao_Paulo</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Exemplo de requisição</h4>
+      <div class="code" data-lang="bash">
+        <div class="code-head"><span class="code-lang">cURL</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>curl --request GET \
+  --url 'https://integration.contelege.com.br/v2/tasks?page=1&amp;perPage=10&amp;timezone=America/Sao_Paulo' \
+  --header 'authorization: Bearer &lt;seu_token&gt;' \
+  --header 'x-api-key: &lt;sua_chave&gt;'</code></pre>
+      </div>
+
+      <h4>Resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "tasks": [
+    {
+      "id": "019e5830-...",
+      "os": "59448",
+      "status": "completo",
+      "datetime": "2026-05-22T13:00:00.000Z",
+      "userName": "Vanessa",
+      "poi": { }
+    }
+  ]
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- POST /tasks -->
+    <article id="task-criar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-post">POST</span>
+        <code class="ep-path">/tasks</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Criar visita</h3>
+      <p>Agenda uma nova visita em um local.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Corpo da requisição</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>datetime</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>Data e hora da visita.</td></tr>
+          <tr><td><code>poiId</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>ID do local.</td></tr>
+          <tr><td><code>timezone</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>Fuso horário.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Exemplo de resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "id": "019e5830-aa11-7c33-9def-0123456789ab",
+  "poiId": "1a4c98eb-705a-4314-b394-4b71c2b9352c",
+  "datetime": "2026-06-15T13:00:00.000Z",
+  "timezone": "America/Sao_Paulo",
+  "status": "pendente",
+  "createdAt": "2026-06-09T13:00:00.000Z"
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- DELETE /tasks/delete_tasks -->
+    <article id="task-excluir" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-del">DELETE</span>
+        <code class="ep-path">/tasks/delete_tasks</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+        <span class="pill pill-danger">destrutivo</span>
+      </div>
+      <h3 class="ep-title">Excluir visitas</h3>
+      <p>Exclui uma ou mais visitas.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros de query</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>tasks_ids</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>IDs das visitas a excluir.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-red"><strong>Operação destrutiva.</strong> Remove visitas permanentemente.</div>
+
+      <h4>Exemplo de resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "deleted": 2,
+  "tasks_ids": [
+    "019e5830-aa11-7c33-9def-0123456789ab",
+    "019e5712-bb22-7d44-8aef-1234567890cd"
+  ]
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- GET /tasks/{taskId} -->
+    <article id="task-id" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/tasks/{taskId}</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Buscar visita por ID</h3>
+      <p>Retorna os dados completos de uma visita.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros de path</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>taskId</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>ID da visita.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Resposta <span class="status-code sc-200">200</span> <span class="muted">(campos reais)</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "id": "019e5830-...",
+  "poiId": "...",
+  "userId": "...",
+  "timezone": "...",
+  "datetime": "...",
+  "status": "completo",
+  "checkinTime": "...",
+  "checkoutTime": "...",
+  "observation": "...",
+  "comments": "...",
+  "os": "...",
+  "forms": [ ],
+  "photos": [ ],
+  "signatureDocument": "...",
+  "responsibleSignature": "...",
+  "rescheduled": false,
+  "poi": { },
+  "createdAt": "...",
+  "updatedAt": "..."
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- PUT /tasks/{taskId} -->
+    <article id="task-atualizar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-put">PUT</span>
+        <code class="ep-path">/tasks/{taskId}</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Atualizar visita</h3>
+      <p>Atualiza os dados de uma visita existente.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros de path</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>taskId</code></td><td>string</td><td><span class="req req-yes">Sim</span></td><td>ID da visita.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Exemplo de resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "id": "019e5830-aa11-7c33-9def-0123456789ab",
+  "status": "completo",
+  "observation": "Visita concluída",
+  "updatedAt": "2026-06-09T13:15:00.000Z"
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- POST /tasks/{taskId}/reschedule -->
+    <article id="task-reagendar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-post">POST</span>
+        <code class="ep-path">/tasks/{taskId}/reschedule</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Reagendar visita</h3>
+      <p>Reagenda uma visita para outra data.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Parâmetros</h4>
+      <table>
+        <thead><tr><th>Parâmetro</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td><code>taskId</code></td><td>string (path)</td><td><span class="req req-yes">Sim</span></td><td>ID da visita.</td></tr>
+          <tr><td><code>id</code></td><td>string (body)</td><td><span class="req req-yes">Sim</span></td><td>Identificador da visita.</td></tr>
+          <tr><td><code>clientId</code></td><td>string (body)</td><td><span class="req req-yes">Sim</span></td><td>ID do cliente.</td></tr>
+          <tr><td><code>taskDate</code></td><td>string (body)</td><td><span class="req req-yes">Sim</span></td><td>Nova data da visita.</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Exemplo de resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>{
+  "id": "019e5830-aa11-7c33-9def-0123456789ab",
+  "rescheduled": true,
+  "taskDate": "2026-06-20T09:00:00.000Z",
+  "clientId": "...",
+  "updatedAt": "2026-06-09T13:20:00.000Z"
+}</code></pre>
+      </div>
+    </article>
+
+    <!-- ===================== USERS & CATEGORIES ===================== -->
+    <section class="cat-divider" id="cat-users"><h2>Users &amp; Categories</h2><p>Usuários (colaboradores) e categorias de locais.</p></section>
+
+    <!-- GET /users -->
+    <article id="users-listar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/users</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Listar usuários</h3>
+      <p>Retorna a lista de usuários (colaboradores).</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+    </article>
+
+    <!-- GET /categories -->
+    <article id="cat-listar" class="endpoint flag-green">
+      <div class="ep-head">
+        <span class="m-badge m-get">GET</span>
+        <code class="ep-path">/categories</code>
+        <span class="pill pill-ok">✅ Testado (200)</span>
+      </div>
+      <h3 class="ep-title">Listar categorias</h3>
+      <p>Retorna as categorias de locais.</p>
+      <p class="auth-note">🔒 <a href="#autenticacao">Requer autenticação</a></p>
+
+      <h4>Resposta <span class="status-code sc-200">200</span></h4>
+      <div class="code" data-lang="json">
+        <div class="code-head"><span class="code-lang">JSON</span><button class="copy-btn" type="button">Copiar</button></div>
+<pre><code>[ { "id": 195468, "name": "Lotéricas", "color": "#dfdb35" } ]</code></pre>
+      </div>
+    </article>
+
+    <!-- ===================== ERROS ===================== -->
+    <section id="erros" class="section section-ref">
+      <h2><span class="h-anchor">#</span> Erros &amp; status HTTP</h2>
+      <p>Códigos de status observados nos testes e os padrões esperados em uma API REST.</p>
+      <table>
+        <thead><tr><th>Código</th><th>Significado</th><th>Quando ocorre</th></tr></thead>
+        <tbody>
+          <tr><td><span class="status-code sc-200">200</span></td><td>OK</td><td>Requisição bem-sucedida (confirmado nos endpoints testados).</td></tr>
+          <tr><td><span class="status-code sc-4xx">400</span></td><td>Bad Request</td><td>Parâmetros inválidos ou ausentes <span class="muted">(padrão REST)</span>.</td></tr>
+          <tr><td><span class="status-code sc-4xx">401</span></td><td>Unauthorized</td><td>Credenciais ausentes <span class="muted">(padrão REST)</span>.</td></tr>
+          <tr><td><span class="status-code sc-4xx">403</span></td><td>Forbidden</td><td>Par <code>authorization</code> + <code>x-api-key</code> inválido, descasado ou rotacionado <strong>(confirmado em teste)</strong>.</td></tr>
+          <tr><td><span class="status-code sc-4xx">404</span></td><td>Not Found</td><td>Recurso inexistente <span class="muted">(padrão REST)</span>.</td></tr>
+          <tr><td><span class="status-code sc-500">500</span></td><td>Internal Server Error</td><td>Erro interno. <strong>Confirmado em <code>GET /refunds/{refundId}</code></strong> mesmo com ID válido.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===================== QA SUMMARY ===================== -->
+    <section id="qa" class="section section-ref">
+      <h2><span class="h-anchor">#</span> Achados de QA (pós-testes)</h2>
+      <p><strong>Cobertura:</strong> 23 dos 24 endpoints testados — 22 funcionando (200), 1 com bug confirmado e 1 ainda pendente (<code>POST /refunds</code>). Inclui leitura (GET) e escrita (POST/PUT/DELETE).</p>
+
+      <div class="callout callout-ok">
+        <strong>✅ Funcionam (200):</strong> todos os endpoints de <strong>POIs</strong>, <strong>Portfólios</strong>, <strong>Tasks</strong>, <strong>Users</strong> e <strong>Categories</strong>; em <strong>Refunds</strong>: <code>GET /refunds</code>, <code>GET /refunds/km</code>, <code>GET /refunds/km/{refundId}</code> e <code>PUT /refunds/{refundId}</code>.
+      </div>
+
+      <div class="callout callout-amber">
+        <strong>⚠️ Divergência confirmada — <code>GET /pois</code>:</strong> <code>page</code> e <code>perPage</code> constam opcionais no Swagger, mas são obrigatórios na prática. Recomendação: corrigir a doc oficial.
+      </div>
+
+      <div class="callout callout-red">
+        <strong>🔴 Bug confirmado — <code>GET /refunds/{refundId}</code>:</strong> retorna <code>500 Internal Server Error</code> com <code>refundId</code> válido (2 IDs testados). Reportar ao time com os reference ids.
+      </div>
+
+      <div class="callout callout-todo">
+        <strong>⏳ Pendente:</strong> <code>POST /refunds</code> (criar reembolso) — único endpoint ainda não validado.
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <p>Contele Equipes (Teams) — API de Integração v2 · Documentação gerada a partir dos testes de QA.</p>
+      <p><a href="https://contele.github.io/api_de_integracao_contele_equipes/" target="_blank" rel="noopener">Documentação oficial (Swagger) ↗</a></p>
+    </footer>
+
+  </main>
+</div>
+
+<button class="to-top" id="toTop" aria-label="Voltar ao topo" title="Voltar ao topo">↑</button>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
