@@ -40,7 +40,7 @@ contele-teams-api-docs/
 - **Botão "Copiar"** em cada bloco de código.
 - **Deep-links**: cada seção e endpoint tem âncora clicável que copia o link direto.
 - **Tabelas de parâmetros** (Query / Path / Body) com Nome · Tipo · Obrigatório · Descrição.
-- **Selos de status** por endpoint: ✅ testado · 🔴 bug · ⏳ não testado.
+- **Selos de status** por endpoint: ✅ testado · 🔴 bug ·
 - **Responsivo** (mobile e desktop) com menu off-canvas no mobile.
 - **Acessibilidade**: skip link, foco visível por teclado, `aria-*` no menu, e respeito a `prefers-reduced-motion`.
 - **Fontes auto-hospedadas** (Inter + JetBrains Mono em `assets/fonts/`) — **100% offline, sem nenhuma dependência externa nem CDN**.
